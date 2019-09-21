@@ -27,9 +27,15 @@ describe('Pizza service', () => {
 
     service.updatePizza(pizza).subscribe(response => {
       expect(response).toEqual(pizza);
-    })
+    });
 
-    backend.expectOne(`${environment.baseUrl}/pizzas/${pizza.id}`).flush(mockResponse);
+    const req = backend.expectOne(`${environment.baseUrl}/pizzas/${pizza.id}`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(pizza);
+    req.flush(mockResponse);
+  });
+
+  afterEach(() => {
     backend.verify();
   });
 
