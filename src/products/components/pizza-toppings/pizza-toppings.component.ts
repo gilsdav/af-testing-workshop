@@ -3,6 +3,7 @@ import {
   Input,
   forwardRef,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -19,7 +20,7 @@ const PIZZA_TOPPINGS_ACCESSOR = {
   styleUrls: ['pizza-toppings.component.scss'],
   template: `
     <div class="pizza-toppings">
-      <div 
+      <div
         class="pizza-toppings-item"
         *ngFor="let topping of toppings;"
         (click)="selectTopping(topping)"
@@ -38,6 +39,8 @@ export class PizzaToppingsComponent implements ControlValueAccessor {
   private onTouch: Function;
   private onModelChange: Function;
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   registerOnChange(fn: Function) {
     this.onModelChange = fn;
   }
@@ -48,6 +51,7 @@ export class PizzaToppingsComponent implements ControlValueAccessor {
 
   writeValue(value: string[]) {
     this.value = value;
+    this.cdr.markForCheck();
   }
 
   selectTopping(topping: string) {

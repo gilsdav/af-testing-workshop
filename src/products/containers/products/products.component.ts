@@ -4,16 +4,19 @@ import { Pizza } from '../../models/pizza.model';
 import { PizzasService } from '../../services/pizzas.service';
 
 import * as fromStore from '../../store';
+import { Store, Select } from '@ngxs/store';
+import { PizzasAction, PizzasState } from '../../store';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'products',
   // changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['products.component.scss'],
   template: `
-    <div class="products">
+    <div class="products" *ngIf="(pizzas$ | async) as pizzas">
       <div class="products__new">
         <a
-          class="btn btn__ok" 
+          class="btn btn__ok"
           routerLink="./new">
           New Pizza
         </a>
@@ -31,13 +34,13 @@ import * as fromStore from '../../store';
   `,
 })
 export class ProductsComponent implements OnInit {
-  pizzas: Pizza[];
 
-  constructor(private pizzaService: PizzasService) {}
+  @Select(PizzasState.pizzas)
+  public pizzas$: Observable<Pizza[]>;
+
+  constructor(private store: Store) {}
 
   ngOnInit() {
-    this.pizzaService.getPizzas().subscribe(pizzas => {
-      this.pizzas = pizzas;
-    });
+    this.store.dispatch(new PizzasAction.LoadList());
   }
 }
