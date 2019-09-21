@@ -3,9 +3,8 @@ import { Action, NgxsOnInit, Selector, State, StateContext } from '@ngxs/store';
 import { PizzasService, ToppingsService } from '../services';
 import { tap } from 'rxjs/operators';
 import { PizzasAction } from './pizzas-actions';
-import { Router } from '@angular/router';
 import { Navigate } from '@ngxs/router-plugin';
-import { patch, removeItem, updateItem } from '@ngxs/store/operators';
+import { patch, updateItem } from '@ngxs/store/operators';
 
 export interface PizzasStateModel {
   pizzas: Pizza[];

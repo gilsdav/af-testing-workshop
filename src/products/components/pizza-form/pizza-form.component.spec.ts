@@ -9,7 +9,7 @@ describe('PizzaFormComponent', () => {
   let component: PizzaFormComponent;
   let fixture: ComponentFixture<PizzaFormComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     // Init module
     TestBed.configureTestingModule({
       declarations: [PizzaFormComponent, PizzaToppingsComponent],
@@ -23,8 +23,7 @@ describe('PizzaFormComponent', () => {
     fixture = TestBed.createComponent(PizzaFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  })
-  );
+  });
 
   it('should invalidate the form if no name', () => {
     // Init form
