@@ -93,19 +93,6 @@ describe('ProductItemComponent (new)', () => {
     params: new BehaviorSubject({})
   };
 
-  const mockedPizzaList = [
-    {
-      id: 1,
-      name: '4 fromages',
-      toppings: ['ham', 'bacon']
-    },
-    {
-      id: 2,
-      name: '4 fromages',
-      toppings: ['ham', 'bacon']
-    }
-  ];
-
   beforeEach(() => {
     // Init module
     TestBed.configureTestingModule({
