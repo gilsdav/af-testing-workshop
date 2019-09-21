@@ -103,11 +103,12 @@ export class PizzasState implements NgxsOnInit {
 
   @Action(PizzasAction.Delete)
   deletePizza(ctx: StateContext<PizzasStateModel>, action: PizzasAction.Delete) {
+    const state = ctx.getState();
     const remove = window.confirm('Are you sure?');
     if (remove) {
       ctx.setState(
         patch({
-          pizzas: removeItem<Pizza>(pizza => pizza.id === action.pizza.id)
+          pizzas: state.pizzas.filter(pizza => pizza.id !== action.pizza.id)
         })
       );
       return this.pizzasService.removePizza(action.pizza).subscribe(() => {

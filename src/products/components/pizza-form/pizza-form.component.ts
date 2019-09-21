@@ -7,18 +7,19 @@ import {
   SimpleChanges,
   ChangeDetectionStrategy,
   OnInit,
+  OnDestroy,
 } from '@angular/core';
 import {
   FormControl,
   FormGroup,
-  FormArray,
   FormBuilder,
   Validators,
 } from '@angular/forms';
 
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 
 import { Pizza } from '../../models/pizza.model';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'pizza-form',
@@ -59,36 +60,38 @@ import { Pizza } from '../../models/pizza.model';
 
         <div class="pizza-form__actions">
           <button
+            id="create_button"
             type="button"
             class="btn btn__ok"
-            *ngIf="!exists"
+            *ngIf="!(exists | async)"
             (click)="createPizza(form)">
             Create Pizza
           </button>
 
-          <button
-            type="button"
-            class="btn btn__ok"
-            *ngIf="exists"
-            (click)="updatePizza(form)">
-            Save changes
-          </button>
+          <ng-container *ngIf="exists | async">
+            <button
+              id="update_button"
+              type="button"
+              class="btn btn__ok"
+              (click)="updatePizza(form)">
+              Save changes
+            </button>
 
-          <button
-            type="button"
-            class="btn btn__warning"
-            *ngIf="exists"
-            (click)="removePizza(form)">
-            Delete Pizza
-          </button>
+            <button
+              type="button"
+              class="btn btn__warning"
+              (click)="removePizza(form)">
+              Delete Pizza
+            </button>
+          </ng-container>
         </div>
 
       </form>
     </div>
   `,
 })
-export class PizzaFormComponent implements OnInit, OnChanges {
-  exists = false;
+export class PizzaFormComponent implements OnInit, OnChanges, OnDestroy {
+  exists = new BehaviorSubject<boolean>(false);
 
   @Input() pizza: Pizza;
   @Input() toppings: string[];
@@ -104,6 +107,8 @@ export class PizzaFormComponent implements OnInit, OnChanges {
     sizes: [[]],
   });
 
+  private destroyObservables = new Subject();
+
   constructor(private fb: FormBuilder) {}
 
   get nameControl() {
@@ -117,15 +122,24 @@ export class PizzaFormComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.form
       .get('toppings')
-      .valueChanges.pipe(map(toppings => ({ ...this.pizza, toppings })))
+      .valueChanges.pipe(
+        map(toppings => ({ ...this.pizza, toppings })),
+        takeUntil(this.destroyObservables)
+      )
       .subscribe(value => this.selected.emit(value));
+      console.log('init');
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.pizza && this.pizza && this.pizza.id) {
-      this.exists = true;
+      this.exists.next(true);
       this.form.patchValue(this.pizza, {emitEvent: false, onlySelf: true});
     }
+  }
+
+  ngOnDestroy() {
+    this.destroyObservables.next();
+    console.log('destroy');
   }
 
   createPizza(form: FormGroup) {
