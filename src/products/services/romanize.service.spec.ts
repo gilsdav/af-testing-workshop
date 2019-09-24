@@ -86,4 +86,8 @@ describe('Romanize service', () => {
     expect(service.romanize(308)).toBe('CCCVIII');
   });
 
+  it('should not understand', () => {
+    expect(service.romanize('hellop')).toBe('?');
+  });
+
 });
