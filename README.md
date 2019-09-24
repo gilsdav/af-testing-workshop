@@ -2,98 +2,89 @@
 
 *Based on https://github.com/toddmotto/ac-boilerplate*
 
-![Zozor](https://avatars0.githubusercontent.com/u/16272733?s=200&v=4)
+![Zozor](https://simplifyingtechblog.files.wordpress.com/2017/06/angularjasmine.png?w=520&h=297&crop=1)
 
-## Development server
+## Lancer les test
 
-Exécutez la commande `npm start` pour démarrer les serveurs.
-Naviguez sur http://localhost:4200/. L'application va automatiquement se recharger quand vous ferez des changements dans le code.
-
-L'API Rest est disponible à l'adresse `http://localhost:3000/`
+Exécutez la commande `npm run test` pour démarrer les tests.
 
 ## Mise en pratique
 
-### Action/Reducer
+### Service business
+Dans le fichier `romanize.service.spec.ts`
+#### Règles
+1) Un nombre en chiffres romains se lit de gauche à droite ;
+2) Un même symbole n'est pas employé quatre fois de suite (sauf M) ;
+3) Tout symbole qui suit un symbole de valeur supérieure ou égale s’ajoute à celui-ci (exemple : 6 s'écrit VI) ;
+4) Tout symbole qui précède un symbole de valeur supérieure se soustrait à ce dernier ;
+    * I doit être retranché à V ou à X quand I est devant V ou X (ex. : 4 s'écrit IV),
+    * X doit être retranché à L ou à C quand X est devant L ou C (ex. : 40 s'écrit XL),
+    * C doit être retranché à D ou à M quand C est devant D ou M (ex. : 900 s'écrit CM),
+    * Par contre, ôter I de L ou de C n'est pas pratiqué (49 s'écrit XLIX et non IL ; 99 s'écrit XCIX et pas IC) ;
+5) Les symboles sont groupés par ordre décroissant, sauf pour les valeurs à retrancher selon la règle précédente (ex. : 1 030 s'écrit MXXX et non XXXM qui est une des façons de représenter 970note 1).
 
-#### 1. Ajouter NGRX dans le feature module "product" ####
-* Initialisez, pour le moment, les imports en `forFeature('products', {})` et `forFeature([])`
+994 s’écrit CMXCIV et se décompose comme suit: 100 soustrait à 1000 (900) + 10 soustrait à 100 (90) + 1 soustrait à 5 (4) = 994.
 
-#### 2. Créer les actions "LOAD_PIZZAS" ####
-* Dans `pizzas.action.ts`
-* A créer: `LOAD_PIZZAS`, `LOAD_PIZZAS_SUCCESS` et `LOAD_PIZZAS_FAIL`
-* Consignes:
-    * LoadPizzas n'a pas de payload
-    * LoadPizzasSuccess prend `Pizza[]` en payload
-    * LoadPizzasFail prend `any` en payload
+49 s’écrit XLIX pour 10 soustrait à 50 (40) + 1 soustrait à 10 (9) = 49
 
-#### 3. Mise en place du reducer de pizzas ####
-* Dans `pizzas.reducer.ts`
-* Consignes:
-    * L'état doit contenir:
-        * `loaded: boolean`
-        * `loading: boolean`
-        * `pizzas: Pizza[]`
-    * Ajouter les paramètres `state` et `action`, correctement typés, au reducer
-    * Remplir le reducer à l'aide d'un switch/case pour effectuer les actions précédemment créées
+308 s’écrit CCCVIII pour 100+100+100 (300) + 5 + 1+1+1 (3) = 308
 
-#### 4. Enregistrer le reducer de pizzas ####
-* Dans `store/reducers/index.ts`
-* Consignes:
-    * Ajouter `pizzas: fromPizzas.PizzaState` dans le `ProductsState`
-    * Ajouter `pizzas: fromPizzas.reducer` dans le dictionnaire de `reducers`
+Exemples: https://fr.wikipedia.org/wiki/Num%C3%A9ration_romaine#Exemples
 
-* Dans `products.module.ts`
-    * Remplacer l'objet vide du `StoreModule` *(ajouté à l'étape 1)* par le dictionnaire de `reducers`
+### Pipe
+Dans le fichier `date.pipe.spec.ts`
+#### Règles
+- Le pipe date avec la locale "en" doit renvoyer une date au format "MMM dd, yyy" (exemple: Sep 21, 2019) par défaut
+- Si le pipe reçois un string de formatage en paramètren il soit retourner la date dans ce bon format (exemple de format: 'dd/MM/yyyy')
 
-#### 5. Despatcher l'action depuis le container `products` ####
-* Dans `containers/products/products.component.ts`
-* Consignes:
-    * Injecter `private store: Store<fromStore.ProductsState>`
-    * Dispatcher `LoadPizzasSuccess` dans le `subscribe` présent dans le `ngOnInit`
-* Dans `pizzas.reducer.ts`
-    * Ajouter `console.log('LoadPizzasSuccess', state);` dans le cas `LOAD_PIZZAS_SUCCESS`
+### Composant
+Dans le fichier `share-calculator.component.spec.ts`
+#### Règles
+- L'incrémentation se fait toujours de 1
+- La décrémentation se fait toujours de 1
+- Il ne doit pas être possible d'incrémenter au dessus du maximum
+- Il ne doit pas être possible de décrémenter en dessous du minimum (1 et non configurable)
+- Il ne doit pas être possible ni d'incrémenter ni de décrémenter si le maximum est mis à 1 ou 0
 
-### Selector
+### Formulaire
+Dans le fichier `pizza-form.component.spec.ts`
+#### Règles
+- Le formulaire ne doit pas être valide si aucun nom n'a été entré
+- Le formulaire doit être valide si un nom est entré
+- Le bouton "create" doit être affiché s'il s'agit d'une création (pas d'ID)
+- Le bouton "update" doit être affiché s'il s'agit d'une modification (avec ID)
 
-#### 6. Créer un featureSelector
-* Dans `store/reducers/index.ts`
-* Consignes:
-    * Utiliser `createFeatureSelector` pour la feature `'products'` qui a le type `ProductsState`
-    * Utiliser `createSelector` pour
-        * Récupérer l'état des `pizzas` depuis l'état de `products`
-        * Récupérer la liste des pizzas depuis l'état de `pizzas`
+### Web service
+Dans le fichier `pizzas.service.spec.ts`
+#### Règles
+- L'information ne doit pas être altérée entre le retour du serveur et le retour de la fonction
 
-#### 7. Utiliser le selector dans le container
-* Dans `products.component.ts`
-* Consignes:
-    * Renommer `pizzas` par `pizzas$` et le transformet en Observable
-    * L'initialise dans `ngOnInit` à l'aide de `this.store.select(fromStore.getPizzas)`
-    * Remplacer `(pizzas)` par `(pizzas$ | async)` dans l'HTML
-    * Changer la `changeDetection` en `ChangeDetectionStrategy.OnPush`
+### Routing
+Dans le fichier `products.component.spec.ts` 
+#### Règles
+- Une navigation vers le détail d'une pizza doit être effectuée au click sur celle-ci
 
-### Effect
+### Routing 2
+Dans le fichier `product-item.component.spec.ts` 
+#### Règles
+- Mise à jour
+    - La pizza correspondant à l'id contenu en paramètre de l'url doit être chargé en même temps que l'application
+- Création
+    - Aucun appel serveur pour récupérer les pizzas ne doit être fait
 
-### 8. Créer un effet qui appelle le service web de chargement des pizzas
-* Dans `pizzas.effect.ts`
-* Consignes
-    * Ajouter les imports `import { Effect, Actions } from '@ngrx/effects';`
-    * Injecter `private actions$: Actions`
-    * Créer un effet nommé `loadPizzas$` qui utilise `pizzaService`, retourne une action `pizzaActions.LoadPizzasSuccess` si tout c'est bien passé et une action `pizzaActions.LoadPizzasFail` s'il y a eu une erreur
+### Store
+Dans le fichier `pizzas-state.spec.ts`
+#### Règles
+- Le store doit automatiquement charger la liste des toppings
+- Si l'utilisateur répond "oui" à la fenètre de confirmation, une requête de suppression au serveur doit être effectuée
+- Si l'utilisateur répond "non" à la fenètre de confirmation, aucune requête de suppression au serveur ne doit être effectuée
+- S'il y a une demande de mise à jour, une requête serveur de mise à jour doit être effectuée
+- S'il y a une demande de création, une requête serveur de création doit être effectuée
 
-### 9. Enregistrer les effets de pizzas
-* Dans `products.module.ts`
-* Consignes
-    * Remplacer le tableau vide du `EffectsModule` *(ajouté à l'étape 1)* par le tableau de `effects`
+### Marble
+Dans le fichier `products.component.spec.ts` 
+#### Règles
+- Aucun item de doit apparaitre tant que le service n'a pas répondu
 
-### 10. Utiliser l'effet de chargement de pizzas
-* Dans `products.component.ts`
-* Consignes
-    * Supprimer l'appel service et dispatcher l'action `LoadPizzas`
-
-
-## Suite
-* Mettre en place la sélection d'une pizza avec le store
-    * Eviter les appels services multiples
-* Mettre en place un guard qui lance un `LOAD_PIZZAS` au cas ou les pizzas ne sont pas chargées au moment ou l'on accès à une pizza spécifique
 
 ![Zozor](https://www.letscode.hu/img/letscodelogo190.png)
