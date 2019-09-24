@@ -5,6 +5,14 @@ import { By } from '@angular/platform-browser';
 import { PizzaToppingsComponent } from '..';
 import { Pizza } from '../../models/pizza.model';
 
+/*
+  Règles:
+  - Le formulaire ne doit pas être valide si aucun nom n'a été entré
+  - Le formulaire doit être valide si un nom est entré
+  - Le bouton "create" doit être affiché s'il s'agit d'une création (pas d'ID)
+  - Le bouton "update" doit être affiché s'il s'agit d'une modification (avec ID)
+*/
+
 describe('PizzaFormComponent', () => {
   let component: PizzaFormComponent;
   let fixture: ComponentFixture<PizzaFormComponent>;
@@ -13,12 +21,8 @@ describe('PizzaFormComponent', () => {
     // Init module
     TestBed.configureTestingModule({
       declarations: [PizzaFormComponent, PizzaToppingsComponent],
-      imports: [ReactiveFormsModule],
-      // schemas: [NO_ERRORS_SCHEMA]
-    })/*.overrideComponent(PizzaFormComponent, {
-        set: { changeDetection: ChangeDetectionStrategy.Default }
-      })*/
-      .compileComponents();
+      imports: [ReactiveFormsModule]
+    }).compileComponents();
     // Get component
     fixture = TestBed.createComponent(PizzaFormComponent);
     component = fixture.componentInstance;
