@@ -4,6 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Location } from '@angular/common';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
+import { cold, getTestScheduler } from 'jasmine-marbles';
 
 import { NgxsModule, Store } from '@ngxs/store';
 
@@ -14,8 +15,23 @@ import { AppComponent } from '../../../app/containers/app/app.component';
 import { environment } from '../../../environments/environment';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { Pizza } from '../../models/pizza.model';
+import { ProductsComponent } from './products.component';
 
-describe('ProductsComponent', () => {
+const mockedPizzaList: Pizza[] = [
+  {
+    id: 1,
+    name: '4 fromages',
+    toppings: ['ham', 'bacon']
+  },
+  {
+    id: 2,
+    name: '4 fromages',
+    toppings: ['ham', 'bacon']
+  }
+];
+
+describe('Routing', () => {
   let component: AppComponent;
   let pizzaService: PizzasService;
   let fixture: ComponentFixture<AppComponent>;
@@ -23,19 +39,6 @@ describe('ProductsComponent', () => {
   let backend: HttpTestingController;
   let location: Location;
   let router: Router;
-
-  const mockedPizzaList = [
-    {
-      id: 1,
-      name: '4 fromages',
-      toppings: ['ham', 'bacon']
-    },
-    {
-      id: 2,
-      name: '4 fromages',
-      toppings: ['ham', 'bacon']
-    }
-  ];
 
   beforeEach(() => {
     // Init module
@@ -96,6 +99,57 @@ describe('ProductsComponent', () => {
     await fixture.ngZone.run(() => fixture.detectChanges());
 
     expect(location.path()).toBe('/products/2');
+  });
+
+});
+
+describe('ProductsComponent', () => {
+  let component: AppComponent;
+  let pizzaService: PizzasService;
+  let fixture: ComponentFixture<AppComponent>;
+
+  beforeEach(() => {
+    // Init module
+    TestBed.configureTestingModule({
+      declarations: [ProductsComponent],
+      imports: [
+        NoopAnimationsModule,
+        NgxsModule.forRoot([PizzasState], { developmentMode: true }),
+        HttpClientTestingModule
+      ],
+      providers: [
+        PizzasService,
+        ToppingsService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+    // Get instances
+    fixture = TestBed.createComponent(ProductsComponent);
+    component = fixture.componentInstance;
+    pizzaService = TestBed.get(PizzasService);
+  });
+
+  it('should show pizzas', () => {
+    let productListElement = fixture.debugElement.query(By.css('.products__list'));
+
+    // Prepare cold mocked observable
+    const q$ = cold('---x|', { x: mockedPizzaList });
+
+    spyOn(pizzaService, 'getPizzas').and.returnValue(q$);
+
+    // OnInit
+    fixture.detectChanges();
+
+    expect(productListElement).toBeNull('before service response');
+
+    getTestScheduler().flush();
+
+    // Update DOM
+    fixture.detectChanges();
+
+    productListElement = fixture.debugElement.query(By.css('.products__list'));
+
+    expect(productListElement).not.toBeNull('after service response');
   });
 
 });
