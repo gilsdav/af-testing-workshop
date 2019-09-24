@@ -4,6 +4,11 @@ import { PizzasService } from './pizzas.service';
 import { Pizza } from '../models/pizza.model';
 import { environment } from '../../environments/environment';
 
+/*
+  Règles:
+  - L'information ne doit pas être altérée entre le retour du serveur et le retour de la fonction
+*/
+
 describe('Pizza service', () => {
   let backend: HttpTestingController;
   let service: PizzasService;
