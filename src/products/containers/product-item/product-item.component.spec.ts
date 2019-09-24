@@ -12,6 +12,14 @@ import { PizzasState } from '../../store';
 import { PizzasService, ToppingsService } from '../../services';
 import { environment } from '../../../environments/environment';
 
+/*
+  Règles:
+  - Mise à jour
+    - La pizza correspondant à l'id contenu en paramètre de l'url doit être chargé en même temps que l'application
+  - Création
+    - Aucun appel serveur pour récupérer les pizzas ne doit être fait
+*/
+
 describe('ProductItemComponent (update)', () => {
   let component: ProductItemComponent;
   let pizzaService: PizzasService;
@@ -68,7 +76,7 @@ describe('ProductItemComponent (update)', () => {
     expect(component).toBeDefined();
   });
 
-  it('should load pizza 1', async(() => {
+  it('should load pizza 2', async(() => {
     backend.expectOne(`${environment.baseUrl}/pizzas`).flush(mockedPizzaList);
 
     store.selectOnce(PizzasState.selectedPizza).subscribe(pizza => {
