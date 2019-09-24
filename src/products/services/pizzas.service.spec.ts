@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 
 /*
   Règles:
-  - L'information ne doit pas être altérée entre le retour du serveur et le retour de la fonction
+  - L'information ne doit pas être altérée entre le retour du serveur et le retour de la fonction update
 */
 
 describe('Pizza service', () => {
