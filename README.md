@@ -1,4 +1,4 @@
-# AANGRXWorkshop (Angular Advanced Testing Workshop)
+# AATestingWorkshop (Angular Advanced Testing Workshop)
 
 *Based on https://github.com/toddmotto/ac-boilerplate*
 
